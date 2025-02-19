@@ -50,6 +50,19 @@ body {
   padding: 4px 8px;
   border-radius: 3px;
   font-size: 12px;
+  display: inline-block;
+}
+
+.tag-lg {
+  padding: 8px 16px;
+  border-radius: 3px;
+  font-size: 16px;
+}
+
+.tag-md {
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 14px;
 }
 
 /*  Input and Button Styles */
@@ -227,7 +240,7 @@ body {
   gap: 32px;
   padding: 32px 0;
 }
-.post {
+.post-item {
   width: 800px;
   padding: 32px;
   background-color: var(--primary-100);
@@ -284,11 +297,12 @@ body {
 .contacts {
   position: fixed;
   bottom: 0px;
-  right: 10%;
+  right: 5%;
   height: 75vh;
   border-radius: 8px 8px 0 0;
   background-color: var(--neutral-100);
   width: 350px;
+  border: 1px solid var(--neutral-200);
   .contact-list {
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -298,7 +312,8 @@ body {
     display: flex;
     gap: 12px;
     align-items: center;
-    padding: 8px 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--neutral-300);
     .user-info {
       display: flex;
       gap: 4px;
@@ -339,22 +354,153 @@ body {
   .contact-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 16px 24px;
+    border-bottom: 1px solid var(--neutral-300);
     h2 {
-      color: var(--neutral-800);
+      font-size: 16px;
+      text-transform: uppercase;
+      color: var(--neutral-700);
     }
     span {
-      font-size: 22px;
+      font-size: 26px;
       cursor: pointer;
+      user-select: none;
       width: 30px;
       height: 30px;
       background-color: var(--neutral-300);
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: 500;
       border-radius: 50%;
+      color: var(--neutral-700);
       &:hover {
         background-color: var(--neutral-400);
+      }
+    }
+  }
+}
+
+.post-container {
+  width: 90%;
+  .post {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    .post-header {
+      .post-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--primary-700);
+        margin-bottom: 8px;
+      }
+      .post-info {
+        display: flex;
+        gap: 12px;
+      }
+      .post-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        .post-author {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--primary-700);
+        }
+        .post-date {
+          font-size: 12px;
+          color: var(--neutral-600);
+        }
+      }
+    }
+    .post-content {
+      font-size: 16px;
+      color: var(--neutral-700);
+      line-height: 1.6;
+    }
+    .post-tags {
+      display: flex;
+      gap: 12px;
+    }
+  }
+
+  .comment-form {
+    padding: 22px 0;
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+  .comments {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    padding: 22px 0;
+    .comment-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: flex-start;
+      .commnet-content {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-radius: 3px;
+        border: 1px solid var(--neutral-200);
+        padding: 12px;
+        max-width: 800px;
+        .comment-info {
+          display: flex;
+          gap: 4px;
+          flex-direction: column;
+          .comment-author {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-700);
+          }
+          .comment-date {
+            font-size: 12px;
+            color: var(--neutral-600);
+          }
+        }
+        .comment-text {
+          font-size: 14px;
+          color: var(--neutral-700);
+          line-height: 1.5;
+        }
+        .comment-actions {
+          display: flex;
+          gap: 18px;
+          .react {
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--neutral-700);
+            &.like {
+              &.active {
+                color: var(--primary-500);
+              }
+              &:hover {
+                color: var(--primary-400);
+              }
+            }
+            &.dislike {
+              &.active {
+                color: var(--danger-500);
+              }
+              &:hover {
+                color: var(--danger-400);
+              }
+            }
+            
+          }
+        }
       }
     }
   }
