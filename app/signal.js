@@ -5,8 +5,8 @@ let isUpdateScheduled = false;
 export class Signal {
   #value;
   #listeners;
-  constructor(initlaValue) {
-    this.#value = initlaValue;
+  constructor(initialValue) {
+    this.#value = initialValue;
     this.#listeners = new Set();
   }
 
@@ -26,6 +26,10 @@ export class Signal {
 
   deleteListener(listener) {
     this.#listeners.delete(listener);
+  }
+
+  get listeners() {
+    return this.#listeners;
   }
 
   notifySubscribers() {
@@ -57,7 +61,7 @@ class Effect {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
-    this.deps.forEach((signal) => signal.listeners.delete(this));
+    this.deps.forEach((signal) => signal.deleteListener(this));
     this.deps.clear();
     if (this.cleanup) this.cleanup();
   }
@@ -67,10 +71,14 @@ function scheduleUpdate(signal) {
   scheduledSignals.add(signal);
   if (!isUpdateScheduled) {
     isUpdateScheduled = true;
-    requestAnimationFrame(() => {
-      scheduledSignals.forEach((signal) => signal.notifySubscribers());
+    queueMicrotask(() => {
+      const effectsRun = new Set();
+      scheduledSignals.forEach((signal) => {
+        signal.listeners.forEach((effect) => effectsRun.add(effect));
+      });
       scheduledSignals.clear();
       isUpdateScheduled = false;
+      effectsRun.forEach((effect) => effect.execute());
     });
   }
 }

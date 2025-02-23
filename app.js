@@ -1,4 +1,8 @@
-import { createSignal, Signal } from "./app/signal.js";
+/** @jsx h */
+import { createDom } from "./app/createDom.js";
+import { For } from "./app/For.js";
+import { Fragment } from "./app/Fragment.js";
+import { createEffect, createSignal } from "./app/signal.js";
 import { h, render } from "./app/view.js";
 
 function mockFetch(delay = 1000) {
@@ -46,48 +50,39 @@ const list = createSignal([
 //   list.value = list.value.slice(0, list.value.length - 1);
 // }
 
-function Counter(counter) {
-  return h(
-    "div",
-    null,
-    h("div", null, () =>
-      renderList(counter, (item, index) => h("div", null, item))
-    ),
-    h(
-      "button",
-      {
-        onclick: () => {
-          counter.value = [...counter.value, counter.value.length + 1];
-        },
-      },
-      "add"
-    ),
-    h(
-      "button",
-      {
-        onclick: () => {
-          counter.value = counter.value.slice(0, counter.value.length - 1);
-        },
-      },
-      "remove"
-    )
+// JSX component
+
+function Counter({ count }) {
+  const counter = createSignal(count);
+  return (
+    <div>
+      <div>{counter}</div>
+      <button onclick={() => counter.value++}>Increment</button>
+    </div>
   );
 }
 
 function App() {
-  const show = createSignal(true);
-  const counter = createSignal([1, 2, 3]);
+  const data = createSignal(0);
+  const isLoading = createSignal(false);
 
-  return h(
-    "div",
-    null,
-    () => {
-      if (show.value) {
-        return Counter(counter);
-      }
-      return h("div", null, "Hidden");
-    },
-    h("button", { onclick: () => (show.value = !show.value) }, "Toggle")
+  async function getData() {
+    isLoading.value = true;
+    await mockFetch(2000);
+    data.value = Math.floor(Math.random() * 100);
+    isLoading.value = false;
+  }
+  return (
+    <div>
+      {() => {
+        if (isLoading.value) {
+          return <div>Loading...</div>;
+        } else {
+          return <div>{data}</div>;
+        }
+      }}
+      <button onclick={getData}>Refresh</button>
+    </div>
   );
 }
 

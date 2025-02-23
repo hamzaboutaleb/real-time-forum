@@ -4,7 +4,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script type="module" src="./app.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      .error {
+        color: red;
+      }
+      .success {
+        color: green;
+      }
+    </style>
+    <script>
+      // Configure Babel to use the h function for JSX
+      // Babel.registerPreset("custom-jsx", {
+      //   presets: [
+      //     [
+      //       "env",
+      //       {
+      //         targets: {
+      //           browsers: "last 2 versions",
+      //         },
+      //       },
+      //     ],
+      //     [
+      //       {
+      //         pragma: "h", // Use the h function for JSX
+      //       },
+      //     ],
+      //   ],
+      // });
+    </script>
+    <script type="text/babel" src="./app.js" data-type="module"></script>
   </head>
   <body></body>
 </html>
