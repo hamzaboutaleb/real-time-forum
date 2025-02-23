@@ -1,119 +1,93 @@
 import { createDom } from "./createDom.js";
 import { createEffect } from "./signal.js";
 
-export function For({ each, key, component }) {
+export function For({ each, component }) {
   const container = document.createElement("div");
+  const itemMap = new Map();
   let prevItems = [];
-  let nodes = new Map(); // Map<key, { node: HTMLElement, disposers: Set<Function> }>
-  let children = component;
+  const children = component;
   createEffect(() => {
     const newItems = each.value || [];
-    const newKeys = new Set();
-    const keyMap = new Map();
-    // 1. Create key map for new items
-    newItems.forEach((item, index) => {
-      const keyValue = item.id ?? index;
-      keyMap.set(keyValue, item);
-      newKeys.add(keyValue);
+    const newKeyMap = new Map();
+
+    // Track item changes using a memory-efficient approach
+    // 1. Update existing items and track dependencies
+    newItems.forEach((newItem, index) => {
+      const key = getKey(newItem, index);
+      newKeyMap.set(key, { newItem, index });
+
+      if (itemMap.has(key)) {
+        const entry = itemMap.get(key);
+        // Only update if item reference changed
+        if (entry.item !== newItem) {
+          updateItem(entry, newItem);
+        }
+      }
     });
 
     // 2. Remove deleted items
-    nodes.forEach((value, key) => {
-      if (!newKeys.has(key)) {
-        // Cleanup effects and DOM
-        value.node.remove();
-        nodes.delete(key);
+    itemMap.forEach((entry, key) => {
+      if (!newKeyMap.has(key)) {
+        entry.disposer();
+        entry.node.remove();
+        itemMap.delete(key);
       }
     });
 
-    // 3. Update existing items
+    // 3. Add new items with fine-grained effects
     newItems.forEach((newItem, index) => {
-      const key = newItem.key ?? newItem.id ?? index;
-      const existing = nodes.get(key);
-
-      if (existing) {
-        // Update existing node
-        const newVNode = children(newItem, index);
-        patch(existing, newVNode);
+      const key = getKey(newItem, index);
+      if (!itemMap.has(key)) {
+        const entry = createItemEntry(newItem, index);
+        itemMap.set(key, entry);
+        container.appendChild(entry.node);
       }
     });
 
-    // 4. Add new items
+    // 4. Maintain DOM order
     newItems.forEach((newItem, index) => {
-      const key = newItem.key ?? newItem.id ?? index;
-      if (!nodes.has(key)) {
-        const vnode = children(newItem, index);
-        const node = createDom(vnode);
+      const key = getKey(newItem, index);
+      const current = container.childNodes[index];
+      const target = itemMap.get(key).node;
 
-        nodes.set(key, node);
-        container.appendChild(node);
-      }
-    });
-
-    // 5. Reorder nodes if needed
-    const newOrder = newItems.map(
-      (item, index) => item.key ?? item.id ?? index
-    );
-
-    newOrder.forEach((key, position) => {
-      const node = nodes.get(key);
-      const current = container.childNodes[position];
-      if (current !== node) {
-        container.insertBefore(node, current);
+      if (current !== target) {
+        container.insertBefore(target, current);
       }
     });
 
     prevItems = newItems;
   });
+
+  function getKey(item, index) {
+    return item.key ?? item.id ?? index;
+  }
+
+  function createItemEntry(item, index) {
+    let node = null;
+    // Create new version with tracked dependencies
+    const vdom = children(item);
+    node = createDom(vdom);
+    // Add to temporary fragment
+    const temp = document.createDocumentFragment();
+    temp.appendChild(node);
+    container.insertBefore(temp, container.childNodes[index]);
+
+    return {
+      node,
+      disposer: () => {},
+      item,
+    };
+  }
+
+  function updateItem(entry, newItem) {
+    if (entry.item !== newItem) {
+      entry.disposer();
+      const key = getKey(newItem, entry.index);
+      const newEntry = createItemEntry(newItem, key);
+      itemMap.set(key, newEntry);
+      entry.node.replaceWith(newEntry.node);
+    }
+  }
+
   return container;
-}
-
-// Basic patching function
-function patch(oldNode, newVNode) {
-  // Simple text node patching
-  if (oldNode.nodeType === Node.TEXT_NODE && typeof newVNode === "string") {
-    if (oldNode.textContent !== newVNode) {
-      oldNode.textContent = newVNode;
-    }
-    return;
-  }
-
-  // Element patching
-  if (oldNode.nodeName.toLowerCase() === newVNode.type) {
-    // Patch attributes
-    const oldProps = oldNode._props || {};
-    const newProps = newVNode.props || {};
-
-    // Remove old attributes
-    Object.keys(oldProps).forEach((key) => {
-      if (!(key in newProps)) {
-        oldNode.removeAttribute(key);
-      }
-    });
-
-    // Set new attributes
-    Object.entries(newProps).forEach(([key, value]) => {
-      if (oldProps[key] !== value) {
-        oldNode.setAttribute(key, value);
-      }
-    });
-
-    // Patch children
-    const oldChildren = Array.from(oldNode.childNodes);
-    const newChildren = newVNode.children || [];
-    const max = Math.max(oldChildren.length, newChildren.length);
-
-    for (let i = 0; i < max; i++) {
-      const oldChild = oldChildren[i];
-      const newChild = newChildren[i];
-
-      if (!oldChild) {
-        oldNode.appendChild(createDom(newChild));
-      } else if (!newChild) {
-        oldNode.removeChild(oldChild);
-      } else {
-        patch(oldChild, newChild);
-      }
-    }
-  }
 }
