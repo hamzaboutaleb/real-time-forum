@@ -1,28 +1,34 @@
 import { createSignal, h } from "../../core/index.js";
-import { isAuth, Link } from "../app.js";
+import { isAuth, Link, router } from "../app.js";
+import { fetchJson } from "../utils/fetchJson.js";
+import { wait } from "../utils/wait.js";
 
 async function auth(formData) {
-  const response = await fetch("http://localhost:8000/api/login", {
+  const response = await fetchJson("http://localhost:8000/api/login", {
     method: "POST",
     body: JSON.stringify(Object.fromEntries(formData)),
   });
-  const data = await response.json();
-  if (!response.ok) throw data;
+  const data = response.data;
   return data;
 }
 
 export function LoginPage() {
   const error = createSignal("");
+  const success = createSignal("");
 
   async function handleOnSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     try {
       error.value = "";
-      isAuth.value = !isAuth.value;
       const data = await auth(formData);
+      success.value = "Login successful. Redirecting...";
+      await wait(2000);
+      isAuth.value = true;
+      router.navigate("/");
     } catch (err) {
-      error.value = err.message;
+      console.log(err);
+      error.value = err.data.message;
     }
   }
 
@@ -38,6 +44,8 @@ export function LoginPage() {
         {() => {
           if (error.value != "") {
             return <div class="error">{error}</div>;
+          } else if (success.value != "") {
+            return <div class="success">{success}</div>;
           }
           return null;
         }}

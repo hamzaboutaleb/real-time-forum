@@ -28,7 +28,7 @@ export function Link(props) {
 }
 
 // 2. Create router instance
-const router = createRouter(routes);
+export const router = createRouter(routes);
 
 // 4. Create root app component
 function App() {
