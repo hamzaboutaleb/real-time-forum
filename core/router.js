@@ -1,10 +1,8 @@
-/** @jsx h */
-import { createDom } from "./core/createDom.js";
-import { createEffect, createSignal, untrack } from "./core/signal.js";
-import { h, render } from "./core/view.js";
-import { IndexPage } from "./pages/index.js";
+import { createDom } from "./createDom.js";
+import { createEffect, createSignal, untrack } from "./signal.js";
+import { h } from "./view.js";
 
-function createRouter(routes) {
+export function createRouter(routes) {
   const current = createSignal(null);
   const params = createSignal({});
 
@@ -26,13 +24,11 @@ function createRouter(routes) {
 
       const regex = new RegExp(`^${pattern}$`);
       const match = path.match(regex);
-
       if (match) {
         const routeParams = keys.reduce((acc, key, index) => {
           acc[key] = match[index + 1];
           return acc;
         }, {});
-
         current.value = route.component;
         params.value = routeParams;
         return;
@@ -65,7 +61,7 @@ function createRouter(routes) {
 }
 
 // RouterView component
-function RouterView({ router }) {
+export function RouterView({ router }) {
   const container = document.createElement("div");
   let currentDOMComponent = null;
   let currentComponent = null;
@@ -73,7 +69,6 @@ function RouterView({ router }) {
 
   disposeEffect = createEffect(() => {
     // Cleanup previous component
-    console.log(currentComponent, router.current.value);
     // if (currentComponent == router.current.value) return;
     if (currentDOMComponent) {
       currentDOMComponent.remove();
@@ -100,76 +95,3 @@ function RouterView({ router }) {
 }
 
 // Link component
-function Link(props) {
-  return (
-    <a
-      onClick={(e) => {
-        e.preventDefault();
-        router.navigate(props.to);
-      }}
-      {...props}
-    >
-      {props.children}
-    </a>
-  );
-}
-
-const routes = [
-  { path: "/", component: IndexPage },
-  { path: "/about", component: About },
-  { path: "/users/:id", component: UserProfile },
-];
-
-// 2. Create router instance
-const router = createRouter(routes);
-
-// 3. Create components
-function Home() {
-  const counter = createSignal(0);
-  console.log(router.current.value);
-  return (
-    <div>
-      <h1>Home</h1>
-      <p>Counter: {counter}</p>
-      <button onClick={() => counter.value++}>Increment</button>
-      <button onClick={() => counter.value--}>Decrement</button>
-    </div>
-  );
-}
-
-function About() {
-  return {
-    type: "div",
-    children: [
-      { type: "h1", children: "About Us" },
-      { type: Link, props: { to: "/" }, children: "Go Home" },
-    ],
-  };
-}
-
-function UserProfile({ params }) {
-  return {
-    type: "div",
-    children: [
-      { type: "h1", children: `User ${params.id}` },
-      { type: "p", children: "Profile page content" },
-    ],
-  };
-}
-
-// 4. Create root app component
-function App() {
-  return (
-    <div>
-      <nav>
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-      </nav>
-      <RouterView router={router} />
-      <div>footer</div>
-    </div>
-  );
-}
-
-// Render the app
-render(App(), document.body);

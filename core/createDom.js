@@ -1,3 +1,4 @@
+import { Fragment } from "./Fragment.js";
 import { createEffect, Signal } from "./signal.js";
 
 export function createDom(element, parent = null) {
@@ -6,6 +7,17 @@ export function createDom(element, parent = null) {
   }
   if (typeof element === "string" || typeof element === "number") {
     return document.createTextNode(element);
+  }
+
+  if (element.type === Fragment) {
+    const fragment = document.createDocumentFragment();
+    element.children.forEach((child) => {
+      const childNode = createDom(child);
+      if (childNode) {
+        fragment.appendChild(childNode);
+      }
+    });
+    return fragment;
   }
 
   if (element instanceof DocumentFragment) {
@@ -17,12 +29,17 @@ export function createDom(element, parent = null) {
   }
 
   if (typeof element === "function") {
-    const fragment = document.createElement("div");
+    const fragment = document.createDocumentFragment();
+    let addedElement = null;
+    const position = parent.children.length;
     createEffect(() => {
-      console.log("element", element);
+      if (addedElement) addedElement.remove();
       const newElement = element();
-      fragment.innerHTML = "";
-      fragment.appendChild(createDom(newElement));
+      addedElement = createDom(newElement);
+      const children = Array.from(parent.children);
+      const referenceNode = children[position] || null;
+      parent.insertBefore(addedElement, referenceNode);
+      console.log("addedElement", addedElement);
     });
     return fragment;
   }

@@ -1,8 +1,8 @@
 import { createDom } from "./createDom.js";
 import { createEffect } from "./signal.js";
 
-export function For({ each, component }) {
-  const container = document.createElement("div");
+export function For({ each, component, parent }) {
+  const container = createDom(parent);
   const itemMap = new Map();
   let prevItems = [];
   const children = component;

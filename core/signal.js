@@ -68,18 +68,28 @@ class Effect {
 }
 
 function scheduleUpdate(signal) {
-  scheduledSignals.add(signal);
-  if (!isUpdateScheduled) {
-    isUpdateScheduled = true;
-    queueMicrotask(() => {
-      const effectsRun = new Set();
-      scheduledSignals.forEach((signal) => {
-        signal.listeners.forEach((effect) => effectsRun.add(effect));
-      });
-      scheduledSignals.clear();
-      isUpdateScheduled = false;
-      effectsRun.forEach((effect) => effect.execute());
-    });
+  signal.notifySubscribers();
+  // scheduledSignals.add(signal);
+  // if (!isUpdateScheduled) {
+  //   isUpdateScheduled = true;
+  //   queueMicrotask(() => {
+  //     const effetcsRun = new Set();
+  //     scheduledSignals.forEach((signal) => {
+  //       effetcsRun.add(...signal.listeners);
+  //     });
+  //     scheduledSignals.clear();
+  //     isUpdateScheduled = false;
+  //     effetcsRun.forEach((signal) => signal.execute());
+  //   });
+  // }
+}
+
+export function untrack(fn) {
+  const prevEffect = contextStack.pop();
+  try {
+    return fn();
+  } finally {
+    contextStack.push(prevEffect); // Restore tracking
   }
 }
 

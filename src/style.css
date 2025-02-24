@@ -27,6 +27,9 @@
   background: var(--primary-500);
 }
 
+a {
+  cursor: pointer;
+}
 body {
   font-family: "Inter", sans-serif;
 }
