@@ -1,27 +1,15 @@
 import { createSignal } from "../../core/signal.js";
 import { h } from "../../core/view.js";
+import { register } from "../api/auth.js";
 import { Link, router } from "../app.js";
-import { fetchJson } from "../utils/fetchJson.js";
 import { wait } from "../utils/wait.js";
 
-/**
- * 
- * @param {	ID       int64  `json:"id"`
-	Email    string `json:"email"`
-	Age      int64  `json:"age,string"`
-	FirstName string `json:"firstname"`
-	LastName string `json:"lastname"`
-	Username string `json:"username"`
-	Password string `json:"password"`} formData 
- */
-async function postRegister(formData) {
-  const data = await fetchJson("http://localhost:8000/api/register", {
-    method: "POST",
-    body: JSON.stringify(Object.fromEntries(formData)),
-  });
-}
-
-
+// async function postRegister(formData) {
+//   const data = await fetchJson("api/register", {
+//     method: "POST",
+//     body: JSON.stringify(Object.fromEntries(formData)),
+//   });
+// }
 
 export function RegisterPage() {
   const error = createSignal("");
@@ -30,16 +18,13 @@ export function RegisterPage() {
   async function handleOnSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    console.log(JSON.stringify(Object.fromEntries(formData)));
     try {
-      console.log("Registering...");
       error.value = "";
-      await postRegister(formData);
+      await register(formData);
       success.value = "Registration successful. You can now login.";
       await wait(2000);
       router.navigate("/login");
     } catch (err) {
-      console.log(err);
       error.value = err.data.message;
     }
   }

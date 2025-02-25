@@ -1,17 +1,18 @@
 import { render, h, createRouter, createSignal } from "../core/index.js";
 import { RouterView } from "../core/router.js";
+import { getPostById } from "./api/post.js";
 import { Header } from "./components/header.js";
 import { IndexPage } from "./pages/index.js";
 import { LoginPage } from "./pages/login.js";
+import { PostPage } from "./pages/post.js";
 import { RegisterPage } from "./pages/register.js";
 
 const routes = [
   { path: "/", component: IndexPage },
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
+  { path: "/post/:id", component: PostPage },
 ];
-
-export const isAuth = createSignal(false)
 
 export function Link(props) {
   return h(
@@ -30,6 +31,12 @@ export function Link(props) {
 // 2. Create router instance
 export const router = createRouter(routes);
 
+async function getPost(id) {
+  try {
+    const data = await getPostById(1);
+  } catch (e) {}
+}
+
 // 4. Create root app component
 function App() {
   router.navigate("/");
@@ -37,7 +44,6 @@ function App() {
     <div>
       <Header />
       <RouterView router={router} />
-      <div>footer</div>
     </div>
   );
 }

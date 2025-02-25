@@ -1,33 +1,32 @@
 import { createSignal, h } from "../../core/index.js";
-import { isAuth, Link, router } from "../app.js";
-import { fetchJson } from "../utils/fetchJson.js";
+import { auth } from "../api/auth.js";
+import { Link, router } from "../app.js";
+import { isAuth } from "../state.js";
 import { wait } from "../utils/wait.js";
 
-async function auth(formData) {
-  const response = await fetchJson("http://localhost:8000/api/login", {
-    method: "POST",
-    body: JSON.stringify(Object.fromEntries(formData)),
-  });
-  const data = response.data;
-  return data;
-}
+// async function auth(formData) {
+//   const response = await fetchJson("api/login", {
+//     method: "POST",
+//     body: JSON.stringify(Object.fromEntries(formData)),
+//   });
+//   const data = response.data;
+//   return data;
+// }
 
 export function LoginPage() {
   const error = createSignal("");
   const success = createSignal("");
-
   async function handleOnSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     try {
       error.value = "";
       const data = await auth(formData);
+      localStorage.setItem("authToken", data.data.session_id);
       success.value = "Login successful. Redirecting...";
-      await wait(2000);
       isAuth.value = true;
       router.navigate("/");
     } catch (err) {
-      console.log(err);
       error.value = err.data.message;
     }
   }

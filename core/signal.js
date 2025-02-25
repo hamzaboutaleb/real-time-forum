@@ -2,6 +2,31 @@ let contextStack = [];
 let scheduledSignals = new Set();
 let isUpdateScheduled = false;
 
+let isBatching = false;
+let batchedEffects = new Set();
+
+export function batch(callback) {
+  if (isBatching) {
+    // If already batching, just run the callback
+    callback();
+    return;
+  }
+
+  // Start batching
+  isBatching = true;
+  batchedEffects.clear();
+
+  try {
+    // Run the callback
+    callback();
+  } finally {
+    // End batching and process effects
+    isBatching = false;
+    batchedEffects.forEach((effect) => effect.execute());
+    batchedEffects.clear();
+  }
+}
+
 export class Signal {
   #value;
   #listeners;
@@ -21,7 +46,11 @@ export class Signal {
 
   set value(value) {
     this.#value = value;
-    scheduleUpdate(this);
+    if (isBatching) {
+      this.#listeners.forEach((effect) => batchedEffects.add(effect));
+    } else {
+      this.notifySubscribers();
+    }
   }
 
   deleteListener(listener) {

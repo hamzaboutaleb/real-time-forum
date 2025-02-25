@@ -1,83 +1,15 @@
+import { Fragment } from "../../core/Fragment.js";
 import { h } from "../../core/index.js";
+import { router } from "../app.js";
+import { PostList } from "../components/postList.js";
+import { initAuth } from "../utils/initAuth.js";
 
 export function IndexPage() {
+  if (!initAuth(router)) return null;
   return (
-    <div>
+    <Fragment>
       <div class="container">
-        <div id="posts">
-          <div class="post-item">
-            <a class="post-title" href="#">
-              Exciting Update: New Features Launched!
-            </a>
-            <header class="post-header">
-              <div class="avatar avatar--large">H</div>
-              <div class="user-info">
-                <span class="username">Hristo</span>
-                <span class="date">January 30, 2025</span>
-              </div>
-            </header>
-            <div class="post-tags">
-              <span class="tag">Technology</span>
-              <span class="tag">Event</span>
-            </div>
-            <div class="post-content">
-              We are thrilled to announce that the latest update to our platform
-              is now live! It includes several exciting new features, including
-              a customizable dashboard and new notification settings.
-            </div>
-            <a href="#" class="post-read-more">
-              read more
-            </a>
-          </div>
-          <div class="post-item">
-            <a class="post-title" href="#">
-              Exciting Update: New Features Launched!
-            </a>
-            <header class="post-header">
-              <div class="avatar avatar--large">H</div>
-              <div class="user-info">
-                <span class="username">Hristo</span>
-                <span class="date">January 30, 2025</span>
-              </div>
-            </header>
-            <div class="post-tags">
-              <span class="tag">Technology</span>
-              <span class="tag">Event</span>
-            </div>
-            <div class="post-content">
-              We are thrilled to announce that the latest update to our platform
-              is now live! It includes several exciting new features, including
-              a customizable dashboard and new notification settings.
-            </div>
-            <a href="#" class="post-read-more">
-              read more
-            </a>
-          </div>
-          <div class="post-item">
-            <a class="post-title" href="#">
-              Exciting Update: New Features Launched!
-            </a>
-            <header class="post-header">
-              <div class="avatar avatar--large">H</div>
-              <div class="user-info">
-                <span class="username">Hristo</span>
-                <span class="date">January 30, 2025</span>
-              </div>
-            </header>
-            <div class="post-tags">
-              <span class="tag">Technology</span>
-              <span class="tag">Event</span>
-            </div>
-            <div class="post-content">
-              We are thrilled to announce that the latest update to our platform
-              is now live! It includes several exciting new features, including
-              a customizable dashboard and new notification settings.
-            </div>
-            <a href="#" class="post-read-more">
-              read more
-            </a>
-          </div>
-        </div>
+        <PostList />
       </div>
 
       <div class="chat-windws-list">
@@ -350,6 +282,6 @@ export function IndexPage() {
           </div>
         </div>
       </div>
-    </div>
+    </Fragment>
   );
 }

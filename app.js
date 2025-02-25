@@ -73,7 +73,6 @@ function RouterView({ router }) {
 
   disposeEffect = createEffect(() => {
     // Cleanup previous component
-    console.log(currentComponent, router.current.value);
     // if (currentComponent == router.current.value) return;
     if (currentDOMComponent) {
       currentDOMComponent.remove();
@@ -89,7 +88,7 @@ function RouterView({ router }) {
         createDom({
           type: Component,
           props: { params: router.params }, // Pass the signal directly
-        })
+        }, container)
       );
       container.appendChild(currentDOMComponent);
       currentComponent = Component;
@@ -126,7 +125,6 @@ const router = createRouter(routes);
 // 3. Create components
 function Home() {
   const counter = createSignal(0);
-  console.log(router.current.value);
   return (
     <div>
       <h1>Home</h1>

@@ -1,6 +1,18 @@
 import { createDom } from "./createDom.js";
-import { createEffect, createSignal, untrack } from "./signal.js";
+import { batch, createEffect, createSignal, untrack } from "./signal.js";
 import { h } from "./view.js";
+
+function deleteElementRecursively(element) {
+  if (!element) return;
+
+  // Recursively remove all children
+  while (element.firstChild) {
+    deleteElementRecursively(element.firstChild);
+  }
+
+  // Remove the element itself from the DOM
+  element.remove();
+}
 
 export function createRouter(routes) {
   const current = createSignal(null);
@@ -29,8 +41,10 @@ export function createRouter(routes) {
           acc[key] = match[index + 1];
           return acc;
         }, {});
-        current.value = route.component;
-        params.value = routeParams;
+        batch(() => {
+          current.value = route.component;
+          params.value = routeParams;
+        });
         return;
       }
     }
@@ -59,10 +73,11 @@ export function createRouter(routes) {
     },
   };
 }
-
+let count = 0;
 // RouterView component
 export function RouterView({ router }) {
   const container = document.createElement("div");
+  container.className = "router-view";
   let currentDOMComponent = null;
   let currentComponent = null;
   let disposeEffect = null;
@@ -70,10 +85,13 @@ export function RouterView({ router }) {
   disposeEffect = createEffect(() => {
     // Cleanup previous component
     // if (currentComponent == router.current.value) return;
-    if (currentDOMComponent) {
-      currentDOMComponent.remove();
+    while (container.firstChild) {
+      deleteElementRecursively(container.firstChild);
     }
-
+    // container.innerHTML = "";
+    // if (currentDOMComponent) {
+    //   currentDOMComponent.remove();
+    // }
     // Get current route component and params
     const Component = router.current.value;
     const params = router.params.value;
@@ -81,10 +99,13 @@ export function RouterView({ router }) {
     if (Component) {
       // Create new component with reactive params
       currentDOMComponent = untrack(() =>
-        createDom({
-          type: Component,
-          props: { params: router.params }, // Pass the signal directly
-        })
+        createDom(
+          {
+            type: Component,
+            props: { params }, // Pass the signal directly
+          },
+          container
+        )
       );
       container.appendChild(currentDOMComponent);
       currentComponent = Component;

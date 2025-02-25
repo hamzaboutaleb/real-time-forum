@@ -1,4 +1,5 @@
 import { Fragment } from "./Fragment.js";
+import { onMount, onUnmount } from "./mount.js";
 import { createEffect, Signal } from "./signal.js";
 
 export function createDom(element, parent = null) {
@@ -12,7 +13,7 @@ export function createDom(element, parent = null) {
   if (element.type === Fragment) {
     const fragment = document.createDocumentFragment();
     element.children.forEach((child) => {
-      const childNode = createDom(child);
+      const childNode = createDom(child, parent);
       if (childNode) {
         fragment.appendChild(childNode);
       }
@@ -35,11 +36,10 @@ export function createDom(element, parent = null) {
     createEffect(() => {
       if (addedElement) addedElement.remove();
       const newElement = element();
-      addedElement = createDom(newElement);
+      addedElement = createDom(newElement, parent);
       const children = Array.from(parent.children);
       const referenceNode = children[position] || null;
       parent.insertBefore(addedElement, referenceNode);
-      console.log("addedElement", addedElement);
     });
     return fragment;
   }
@@ -56,12 +56,13 @@ export function createDom(element, parent = null) {
       ...element.props,
       children: element.children,
     });
-    const result = createDom(componentVNode);
+    const result = createDom(componentVNode, parent);
     return result;
   }
   const node = document.createElement(element.type);
   if (element.props) {
     for (let [key, value] of Object.entries(element.props)) {
+      if (key === "onMount" || key == "onUnmount") continue;
       if (key.startsWith("on")) {
         addEventListener(node, key.slice(2).toLowerCase(), value);
       } else if (value instanceof Signal) {
@@ -71,6 +72,13 @@ export function createDom(element, parent = null) {
       }
     }
   }
+  if (element.props?.onMount) {
+    onMount(node, element.props.onMount);
+  }
+  if (element.props?.onUnmount) {
+    onUnmount(node, element.props.onUnmount);
+  }
+
   if (Array.isArray(element.children)) {
     element.children.forEach((child) => {
       const result = createDom(child, node);

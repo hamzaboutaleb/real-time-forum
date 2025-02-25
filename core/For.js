@@ -1,8 +1,8 @@
 import { createDom } from "./createDom.js";
-import { createEffect } from "./signal.js";
+import { createEffect, untrack } from "./signal.js";
 
-export function For({ each, component, parent }) {
-  const container = createDom(parent);
+export function For({ each, component, container }) {
+  const containerElement = createDom(container);
   const itemMap = new Map();
   let prevItems = [];
   const children = component;
@@ -10,8 +10,6 @@ export function For({ each, component, parent }) {
     const newItems = each.value || [];
     const newKeyMap = new Map();
 
-    // Track item changes using a memory-efficient approach
-    // 1. Update existing items and track dependencies
     newItems.forEach((newItem, index) => {
       const key = getKey(newItem, index);
       newKeyMap.set(key, { newItem, index });
@@ -40,18 +38,18 @@ export function For({ each, component, parent }) {
       if (!itemMap.has(key)) {
         const entry = createItemEntry(newItem, index);
         itemMap.set(key, entry);
-        container.appendChild(entry.node);
+        containerElement.appendChild(entry.node);
       }
     });
 
     // 4. Maintain DOM order
     newItems.forEach((newItem, index) => {
       const key = getKey(newItem, index);
-      const current = container.childNodes[index];
+      const current = containerElement.childNodes[index];
       const target = itemMap.get(key).node;
 
       if (current !== target) {
-        container.insertBefore(target, current);
+        containerElement.insertBefore(target, current);
       }
     });
 
@@ -70,7 +68,7 @@ export function For({ each, component, parent }) {
     // Add to temporary fragment
     const temp = document.createDocumentFragment();
     temp.appendChild(node);
-    container.insertBefore(temp, container.childNodes[index]);
+    containerElement.insertBefore(temp, containerElement.childNodes[index]);
 
     return {
       node,
@@ -89,5 +87,5 @@ export function For({ each, component, parent }) {
     }
   }
 
-  return container;
+  return containerElement;
 }
