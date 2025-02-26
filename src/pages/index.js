@@ -12,7 +12,7 @@ export function IndexPage() {
         <PostList />
       </div>
 
-      <div class="chat-windws-list">
+      {/* <div class="chat-windws-list">
         <div class="contacts">
           <header class="contact-header">
             <h2>Contacts</h2>
@@ -281,7 +281,7 @@ export function IndexPage() {
             </form>
           </div>
         </div>
-      </div>
+      </div> */}
     </Fragment>
   );
 }

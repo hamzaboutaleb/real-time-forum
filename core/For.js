@@ -7,7 +7,7 @@ export function For({ each, component, container }) {
   let prevItems = [];
   const children = component;
   createEffect(() => {
-    const newItems = each.value || [];
+    const newItems = each.value || each || [];
     const newKeyMap = new Map();
     newItems.forEach((newItem, index) => {
       const key = getKey(newItem, index);

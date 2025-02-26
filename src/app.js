@@ -1,7 +1,9 @@
 import { render, h, createRouter, createSignal } from "../core/index.js";
 import { RouterView } from "../core/router.js";
 import { getPostById } from "./api/post.js";
+import { Footer } from "./components/footer.js";
 import { Header } from "./components/header.js";
+import { CreatePostPage } from "./pages/createPost.js";
 import { IndexPage } from "./pages/index.js";
 import { LoginPage } from "./pages/login.js";
 import { PostPage } from "./pages/post.js";
@@ -13,10 +15,10 @@ const routes = [
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
   { path: "/post/:id", component: PostPage },
+  { path: "/create", component: CreatePostPage },
 ];
 
 export function Link(props) {
-  
   return h(
     "a",
     {
@@ -43,11 +45,12 @@ async function getPost(id) {
 // 4. Create root app component
 function App() {
   router.navigate("/");
-  initAuth()
+  initAuth();
   return (
     <div>
       <Header />
       <RouterView router={router} />
+      <Footer />
     </div>
   );
 }

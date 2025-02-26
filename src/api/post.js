@@ -13,3 +13,11 @@ export async function getPosts(page = 1) {
   });
   return data;
 }
+
+export async function createPost(post) {
+  const data = await fetchJson("api/post", {
+    method: "POST",
+    body: JSON.stringify(post),
+  });
+  return data;
+}

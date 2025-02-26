@@ -1,6 +1,6 @@
 import { For } from "../../core/For.js";
 import { Fragment } from "../../core/Fragment.js";
-import { createEffect, createSignal } from "../../core/signal.js";
+import { batch, createEffect, createSignal } from "../../core/signal.js";
 import { h } from "../../core/view.js";
 import { getPosts } from "../api/post.js";
 import { handleLogout } from "../utils/logout.js";
@@ -18,20 +18,21 @@ export function PostList() {
 
   async function getAllPosts() {
     try {
-      loading.value = true;
-      error.value = "";
+      batch(() => {
+        loading.value = true;
+        error.value = "";
+      });
+      console.log("page", page);
       const data = await getPosts(page++);
       const newPosts = data.data.data.Data.Posts || [];
       if (newPosts.length == 0) {
         done.value = true;
       }
+      await wait(300);
       posts.value = [...posts.value, ...newPosts];
+      loading.value = false;
     } catch (error) {
       error.value = "Can't Load Data";
-      // if (error.response.status == 401) {
-      //   handleLogout();
-      //   return;
-      // }
     } finally {
       loading.value = false;
     }
@@ -42,9 +43,10 @@ export function PostList() {
       window.innerHeight + window.scrollY >=
       document.body.offsetHeight - 100
     ) {
-      
-      if (error.value == "" && loading.value == false && done.value == false)
+      console.log(loading.value);
+      if (error.value == "" && loading.value == false && done.value == false) {
         getAllPosts();
+      }
     }
   };
 
@@ -70,7 +72,7 @@ export function PostList() {
           } else if (error.value != "") {
             return <h1>{error}</h1>;
           } else if (done.value == true) {
-            return <h1>Done</h1>;
+            return <div class="info text-center"> no more posts </div>;
           } else {
             return null;
           }

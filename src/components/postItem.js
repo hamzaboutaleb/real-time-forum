@@ -18,7 +18,7 @@ export function PostItem({ post }) {
       <For
         each={post.tags}
         component={(tag) => <span class="tag">{tag}</span>}
-        container={<div class="post-tags" />}
+        container={<div class="tags" />}
       />
       {/* <div class="post-tags">
         <span class="tag">Technology</span>
