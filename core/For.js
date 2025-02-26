@@ -9,11 +9,9 @@ export function For({ each, component, container }) {
   createEffect(() => {
     const newItems = each.value || [];
     const newKeyMap = new Map();
-
     newItems.forEach((newItem, index) => {
       const key = getKey(newItem, index);
       newKeyMap.set(key, { newItem, index });
-
       if (itemMap.has(key)) {
         const entry = itemMap.get(key);
         // Only update if item reference changed

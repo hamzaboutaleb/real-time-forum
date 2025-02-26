@@ -15,6 +15,7 @@ const routes = [
 ];
 
 export function Link(props) {
+  
   return h(
     "a",
     {
@@ -22,6 +23,7 @@ export function Link(props) {
         e.preventDefault();
         router.navigate(props.to);
       },
+      href: props.to,
       ...props,
     },
     props.children

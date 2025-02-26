@@ -42,12 +42,9 @@ function createRouter(routes) {
     current.value = routes.find((r) => r.path === "*")?.component || null;
   }
 
-  // Hash-based routing
   window.addEventListener("hashchange", matchRoute);
-  // Path-based routing
   window.addEventListener("popstate", matchRoute);
 
-  // Initial match
   matchRoute();
 
   return {
@@ -64,7 +61,6 @@ function createRouter(routes) {
   };
 }
 
-// RouterView component
 function RouterView({ router }) {
   const container = document.createElement("div");
   let currentDOMComponent = null;
@@ -72,22 +68,19 @@ function RouterView({ router }) {
   let disposeEffect = null;
 
   disposeEffect = createEffect(() => {
-    // Cleanup previous component
     // if (currentComponent == router.current.value) return;
     if (currentDOMComponent) {
       currentDOMComponent.remove();
     }
 
-    // Get current route component and params
     const Component = router.current.value;
     const params = router.params.value;
 
     if (Component) {
-      // Create new component with reactive params
       currentDOMComponent = untrack(() =>
         createDom({
           type: Component,
-          props: { params: router.params }, // Pass the signal directly
+          props: { params: router.params },
         }, container)
       );
       container.appendChild(currentDOMComponent);
@@ -119,21 +112,9 @@ const routes = [
   { path: "/users/:id", component: UserProfile },
 ];
 
-// 2. Create router instance
 const router = createRouter(routes);
 
-// 3. Create components
-function Home() {
-  const counter = createSignal(0);
-  return (
-    <div>
-      <h1>Home</h1>
-      <p>Counter: {counter}</p>
-      <button onClick={() => counter.value++}>Increment</button>
-      <button onClick={() => counter.value--}>Decrement</button>
-    </div>
-  );
-}
+
 
 function About() {
   return {
@@ -155,7 +136,6 @@ function UserProfile({ params }) {
   };
 }
 
-// 4. Create root app component
 function App() {
   return (
     <div>

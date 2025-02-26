@@ -62,7 +62,8 @@ export function createDom(element, parent = null) {
   const node = document.createElement(element.type);
   if (element.props) {
     for (let [key, value] of Object.entries(element.props)) {
-      if (key === "onMount" || key == "onUnmount") continue;
+      if (key === "onMount" || key == "onUnmount" || key == "children")
+        continue;
       if (key.startsWith("on")) {
         addEventListener(node, key.slice(2).toLowerCase(), value);
       } else if (value instanceof Signal) {

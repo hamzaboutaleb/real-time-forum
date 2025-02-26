@@ -28,10 +28,10 @@ export function PostList() {
       posts.value = [...posts.value, ...newPosts];
     } catch (error) {
       error.value = "Can't Load Data";
-      if (error.response.status == 401) {
-        handleLogout();
-        return;
-      }
+      // if (error.response.status == 401) {
+      //   handleLogout();
+      //   return;
+      // }
     } finally {
       loading.value = false;
     }

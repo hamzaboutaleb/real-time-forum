@@ -4,7 +4,7 @@ export async function getPostById(id) {
   const data = await fetchJson(`api/post/${id}`, {
     method: "GET",
   });
-  return data;
+  return data.data.data.Data;
 }
 
 export async function getPosts(page = 1) {
