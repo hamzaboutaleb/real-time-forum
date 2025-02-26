@@ -2,7 +2,7 @@ import { Fragment } from "../../core/Fragment.js";
 import { h } from "../../core/view.js";
 import { logout } from "../api/auth.js";
 import { Link, router } from "../app.js";
-import { isAuth } from "../state.js";
+import { isAuth, username } from "../state.js";
 import { handleLogout } from "../utils/logout.js";
 
 export function Header() {
@@ -27,15 +27,21 @@ export function Header() {
           }
           return (
             <div class="links">
+               <Link to="/create" class="btn btn--primary">
+                Create Post
+              </Link>
               <a
                 onClick={async () => {
                   handleLogout();
                 }}
                 href="#"
               >
-                <span class="avatar avatar--md">H</span>
+                <span class="avatar avatar--md">
+                  {username.value[0]?.toUpperCase()}
+                </span>
                 <span>logout</span>
               </a>
+             
             </div>
           );
         }}

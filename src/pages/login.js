@@ -1,7 +1,7 @@
 import { createSignal, h } from "../../core/index.js";
 import { auth } from "../api/auth.js";
 import { Link, router } from "../app.js";
-import { isAuth } from "../state.js";
+import { isAuth, username } from "../state.js";
 import { wait } from "../utils/wait.js";
 
 // async function auth(formData) {
@@ -22,11 +22,15 @@ export function LoginPage() {
     try {
       error.value = "";
       const data = await auth(formData);
+      console.log(data.data);
       localStorage.setItem("authToken", data.data.session_id);
+      localStorage.setItem("username", data.data.username);
       success.value = "Login successful. Redirecting...";
       isAuth.value = true;
+      username.value = data.data.username;
       router.navigate("/");
     } catch (err) {
+      console.log(err);
       error.value = err.data.message;
     }
   }

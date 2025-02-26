@@ -6,6 +6,7 @@ import { IndexPage } from "./pages/index.js";
 import { LoginPage } from "./pages/login.js";
 import { PostPage } from "./pages/post.js";
 import { RegisterPage } from "./pages/register.js";
+import { initAuth } from "./utils/initAuth.js";
 
 const routes = [
   { path: "/", component: IndexPage },
@@ -42,6 +43,7 @@ async function getPost(id) {
 // 4. Create root app component
 function App() {
   router.navigate("/");
+  initAuth()
   return (
     <div>
       <Header />

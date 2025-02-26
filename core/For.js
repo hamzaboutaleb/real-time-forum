@@ -60,10 +60,8 @@ export function For({ each, component, container }) {
 
   function createItemEntry(item, index) {
     let node = null;
-    // Create new version with tracked dependencies
     const vdom = children(item);
     node = createDom(vdom);
-    // Add to temporary fragment
     const temp = document.createDocumentFragment();
     temp.appendChild(node);
     containerElement.insertBefore(temp, containerElement.childNodes[index]);

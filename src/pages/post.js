@@ -2,6 +2,7 @@ import { For } from "../../core/For.js";
 import { Fragment } from "../../core/Fragment.js";
 import { batch, createSignal } from "../../core/signal.js";
 import { h } from "../../core/view.js";
+import { addComment } from "../api/comment.js";
 import { getPostById } from "../api/post.js";
 import { dislikeComment, likeComment } from "../api/reaction.js";
 import { Link } from "../app.js";
@@ -46,7 +47,7 @@ export function PostPage({ params }) {
       loading.value = true;
       const data = await getPostById(params.id);
       post.value = data.Post;
-      comments.value = data.Comments;
+      comments.value = data.Comments || [];
     } catch (e) {
       console.error(e);
     } finally {
@@ -65,7 +66,7 @@ export function PostPage({ params }) {
           return (
             <Fragment>
               <Post post={post} />
-              <CommnetForm />
+              <CommnetForm comments={comments} postId={post.value.id} />
               <For
                 each={comments}
                 component={(comment) => (
@@ -101,15 +102,49 @@ function Post({ post }) {
   );
 }
 
-function CommnetForm() {
+function CommnetForm({ postId, comments }) {
+  const error = createSignal("");
+  const success = createSignal("");
+  const comment = createSignal("");
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    batch(() => {
+      error.value = "";
+      success.value = "";
+    })
+    let requestData = {};
+    requestData.comment = comment.value;
+    requestData.postId = postId;
+    try {
+      const data = await addComment(requestData);
+      success.value = data.data.message;
+      await wait(1000);
+      batch(() => {
+        comments.value = [data.data.data, ...comments.value];
+        success.value = "";
+        comment.value = "";
+      })
+    } catch (err) {
+      error.value = err.data.message;
+    }
+  };
   return (
     <div class="comment-form">
       <h2 class="comment-form-header">Leave a Comment</h2>
-      <form action="#" method="POST">
+      {() => {
+        if (error.value !== "") {
+          return <div class="error">{error}</div>;
+        } else if (success.value !== "") {
+          return <div class="success">{success}</div>;
+        }
+      }}
+      <form onSubmit={onSubmit} method="POST">
         <textarea
           name="comment"
           rows="4"
           class="input"
+          value={comment}
+          onInput = {(e) => comment.value = e.target.value}
           placeholder="Leave a comment"
         ></textarea>
         <button class="primary-btn" type="submit">
@@ -136,7 +171,6 @@ function CommentItem({ comments, comment }) {
   const onDislikeComment = async () => {
     try {
       const data = await dislikeComment(comment.id);
-      console.log(data);
       comments.value = comments.value.map((c) => {
         if (c.id === comment.id) {
           return { ...c, ...data };
