@@ -63,7 +63,6 @@ export function CreatePostPage() {
 }
 
 function tagsToArray(categoryString) {
-  console.log(categoryString);
   const categoriesArray = categoryString
     .split(",")
     .map((category) => category.trim())

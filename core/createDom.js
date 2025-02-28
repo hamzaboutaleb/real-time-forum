@@ -1,6 +1,6 @@
 import { Fragment } from "./Fragment.js";
 import { onMount, onUnmount } from "./mount.js";
-import { createEffect, Signal } from "./signal.js";
+import { createEffect, Signal, untrack } from "./signal.js";
 
 export function createDom(element, parent = null) {
   if (element === null || element === undefined || element === false) {
@@ -114,6 +114,10 @@ function setAttribute(node, key, value) {
   } else if (typeof value === "function") {
     if (typeof value == "function") {
       createEffect(() => {
+        if (key === "class") {
+          node.className = value();
+          return;
+        }
         node[key] = value();
       });
     } else {

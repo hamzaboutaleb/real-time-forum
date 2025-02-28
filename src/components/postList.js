@@ -22,7 +22,6 @@ export function PostList() {
         loading.value = true;
         error.value = "";
       });
-      console.log("page", page);
       const data = await getPosts(page++);
       const newPosts = data.data.data.Data.Posts || [];
       if (newPosts.length == 0) {
@@ -43,7 +42,6 @@ export function PostList() {
       window.innerHeight + window.scrollY >=
       document.body.offsetHeight - 100
     ) {
-      console.log(loading.value);
       if (error.value == "" && loading.value == false && done.value == false) {
         getAllPosts();
       }

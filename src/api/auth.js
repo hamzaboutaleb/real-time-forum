@@ -19,6 +19,7 @@ export async function register(formData) {
 export async function logout() {
   const token = localStorage.getItem("authToken");
   localStorage.removeItem("authToken");
+  localStorage.removeItem("username");
   await fetchJson("api/logout", {
     method: "POST",
     body: JSON.stringify({ token }),

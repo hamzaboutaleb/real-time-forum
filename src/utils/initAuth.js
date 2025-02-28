@@ -1,10 +1,20 @@
-import { isAuth, username } from "../state.js";
+import { batch } from "../../core/signal.js";
+import getUsers from "../api/user.js";
+import { ws } from "../api/ws.js";
+import { isAuth, username, users } from "../state.js";
+import { initUsers } from "./users.js";
 
-export function initAuth(router) {
+export async function initAuth(router) {
   const token = localStorage.getItem("authToken");
   if (token) {
-    isAuth.value = true;
-    username.value = localStorage.getItem("username");
+    const user = localStorage.getItem("username");
+    username.value = user;
+    const usersData = await getUsers();
+    batch(() => {
+      isAuth.value = true;
+      if (users.value.length === 0) users.value = initUsers(usersData, user);
+    });
+    ws.connect(token);
     return true;
   } else {
     username.value = "";

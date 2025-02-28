@@ -5,6 +5,7 @@ import { h } from "../../core/view.js";
 import { addComment } from "../api/comment.js";
 import { getPostById } from "../api/post.js";
 import { dislikeComment, likeComment } from "../api/reaction.js";
+import { ws } from "../api/ws.js";
 import { Link } from "../app.js";
 import { Loader } from "../components/loader.js";
 import { formatDate } from "../utils/formatDate.js";
@@ -106,12 +107,13 @@ function CommnetForm({ postId, comments }) {
   const error = createSignal("");
   const success = createSignal("");
   const comment = createSignal("");
+  ws.emit("typing", { receiver: 2 });
   const onSubmit = async (e) => {
     e.preventDefault();
     batch(() => {
       error.value = "";
       success.value = "";
-    })
+    });
     let requestData = {};
     requestData.comment = comment.value;
     requestData.postId = postId;
@@ -123,7 +125,7 @@ function CommnetForm({ postId, comments }) {
         comments.value = [data.data.data, ...comments.value];
         success.value = "";
         comment.value = "";
-      })
+      });
     } catch (err) {
       error.value = err.data.message;
     }
@@ -144,7 +146,7 @@ function CommnetForm({ postId, comments }) {
           rows="4"
           class="input"
           value={comment}
-          onInput = {(e) => comment.value = e.target.value}
+          onInput={(e) => (comment.value = e.target.value)}
           placeholder="Leave a comment"
         ></textarea>
         <button class="primary-btn" type="submit">

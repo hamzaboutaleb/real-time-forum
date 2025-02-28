@@ -90,11 +90,11 @@ export function RouterView({ router }) {
     }
     // container.innerHTML = "";
     // if (currentDOMComponent) {
-    //   currentDOMComponent.remove();
-    // }
-    // Get current route component and params
-    const Component = router.current.value;
-    const params = router.params.value;
+      //   currentDOMComponent.remove();
+      // }
+      // Get current route component and params
+      const Component = router.current.value;
+      const params = router.params.value;
 
     if (Component) {
       // Create new component with reactive params

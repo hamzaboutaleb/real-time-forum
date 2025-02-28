@@ -5,7 +5,6 @@ import { PostList } from "../components/postList.js";
 import { initAuth } from "../utils/initAuth.js";
 
 export function IndexPage() {
-  if (!initAuth(router)) return null;
   return (
     <Fragment>
       <div class="container">

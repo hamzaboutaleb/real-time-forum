@@ -22,7 +22,9 @@ export function batch(callback) {
   } finally {
     // End batching and process effects
     isBatching = false;
-    batchedEffects.forEach((effect) => effect.execute());
+    batchedEffects.forEach((effect) => {
+      effect.execute();
+    });
     batchedEffects.clear();
   }
 }
@@ -35,6 +37,9 @@ export class Signal {
     this.#listeners = new Set();
   }
 
+  get realValue() {
+    return this.#value;
+  }
   get value() {
     const effect = contextStack[contextStack.length - 1];
     if (effect) {
@@ -57,12 +62,18 @@ export class Signal {
     this.#listeners.delete(listener);
   }
 
+  clearListeners() {
+    this.#listeners.clear();
+  }
   get listeners() {
     return this.#listeners;
   }
 
   notifySubscribers() {
-    [...this.#listeners].forEach((sub) => sub.execute());
+    console.log("Notifying", this.#listeners.size, "subscribers");
+    [...this.#listeners].forEach((sub) => {
+      sub.execute();
+    });
   }
 }
 

@@ -1,7 +1,11 @@
 import { createSignal, h } from "../../core/index.js";
+import { batch } from "../../core/signal.js";
 import { auth } from "../api/auth.js";
+import getUsers from "../api/user.js";
+import { ws } from "../api/ws.js";
 import { Link, router } from "../app.js";
-import { isAuth, username } from "../state.js";
+import { isAuth, username, users } from "../state.js";
+import { initUsers } from "../utils/users.js";
 import { wait } from "../utils/wait.js";
 
 // async function auth(formData) {
@@ -13,6 +17,12 @@ import { wait } from "../utils/wait.js";
 //   return data;
 // }
 
+function setLoginData(data) {
+  localStorage.setItem("authToken", data.session_id);
+  localStorage.setItem("username", data.username);
+  isAuth.value = true;
+}
+
 export function LoginPage() {
   const error = createSignal("");
   const success = createSignal("");
@@ -22,12 +32,14 @@ export function LoginPage() {
     try {
       error.value = "";
       const data = await auth(formData);
-      console.log(data.data);
-      localStorage.setItem("authToken", data.data.session_id);
-      localStorage.setItem("username", data.data.username);
-      success.value = "Login successful. Redirecting...";
-      isAuth.value = true;
-      username.value = data.data.username;
+      setLoginData(data.data);
+      const usersData = await getUsers();
+      batch(() => {
+        success.value = "Login successful. Redirecting...";
+        username.value = data.data.username;
+        if (users.value.length === 0) users.value = initUsers(usersData, data.data.username);
+        ws.connect(data.data.session_id);
+      });
       router.navigate("/");
     } catch (err) {
       console.log(err);
