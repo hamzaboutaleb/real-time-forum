@@ -70,7 +70,6 @@ export class Signal {
   }
 
   notifySubscribers() {
-    console.log("Notifying", this.#listeners.size, "subscribers");
     [...this.#listeners].forEach((sub) => {
       sub.execute();
     });

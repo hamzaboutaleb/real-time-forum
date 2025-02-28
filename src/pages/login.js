@@ -4,7 +4,7 @@ import { auth } from "../api/auth.js";
 import getUsers from "../api/user.js";
 import { ws } from "../api/ws.js";
 import { Link, router } from "../app.js";
-import { isAuth, username, users } from "../state.js";
+import { isAuth, userId, username, users } from "../state.js";
 import { initUsers } from "../utils/users.js";
 import { wait } from "../utils/wait.js";
 
@@ -18,8 +18,11 @@ import { wait } from "../utils/wait.js";
 // }
 
 function setLoginData(data) {
+  console.log("login data", data);
   localStorage.setItem("authToken", data.session_id);
   localStorage.setItem("username", data.username);
+  localStorage.setItem("userId", data.user_id);
+
   isAuth.value = true;
 }
 
@@ -28,6 +31,7 @@ export function LoginPage() {
   const success = createSignal("");
   async function handleOnSubmit(e) {
     e.preventDefault();
+    console.log("login data");
     const formData = new FormData(e.target);
     try {
       error.value = "";
@@ -37,7 +41,9 @@ export function LoginPage() {
       batch(() => {
         success.value = "Login successful. Redirecting...";
         username.value = data.data.username;
-        if (users.value.length === 0) users.value = initUsers(usersData, data.data.username);
+        userId.value = data.data.user_id;
+        if (users.value.length === 0)
+          users.value = initUsers(usersData, data.data.username);
         ws.connect(data.data.session_id);
       });
       router.navigate("/");

@@ -1,11 +1,11 @@
 import { For } from "../../core/For.js";
 import { onUnmount } from "../../core/mount.js";
-import { createSignal } from "../../core/signal.js";
+import { createSignal, untrack } from "../../core/signal.js";
 import { h } from "../../core/view.js";
 import { fetchMessages } from "../api/messages.js";
 import { ws } from "../api/ws.js";
 import { TypingIndicator } from "../components/typingIndicator.js";
-import { setGlobalMessages, typing } from "../state.js";
+import { setGlobalMessages, typing, userId } from "../state.js";
 import { throttle } from "../utils/throttle.js";
 
 export function ChatPage({ params }) {
@@ -23,9 +23,18 @@ export function ChatPage({ params }) {
   let throttled = throttle(emitTyping, 1000);
   function onSubmit(e) {
     e.preventDefault();
-    console.log("send message");
-    const message = message.value;
-    ws.emit("message", { receiver: +params.id, message });
+    const data = message.value;
+    message.value = "";
+    ws.emit("message", { receiver: +params.id, message: data });
+    messages.value = [
+      ...messages.value,
+      {
+        sender_id: untrack(() => userId.value),
+        receiver_id: +params.id,
+        data: data,
+        timestamp: new Date().toISOString(),
+      },
+    ];
   }
 
   function onUnmount() {
