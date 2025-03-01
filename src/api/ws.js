@@ -1,6 +1,7 @@
 import { batch, untrack } from "../../core/signal.js";
 import { getGlobalMessages, typing, users } from "../state.js";
 import { handleLogout } from "../utils/logout.js";
+import { updateUserLastTimeMessage } from "../utils/users.js";
 import { WS, WS_EVENTS } from "../utils/ws.js";
 
 const WS_URL = "ws://localhost:8000/ws";
@@ -58,7 +59,8 @@ ws.on("typing", (data) => {
 */
 ws.on("message", (data) => {
   console.log("message", data);
-  const { message, receiver, sender } = data;
+  const { message, receiver, sender, timestamp } = data;
+  updateUserLastTimeMessage([sender, receiver], timestamp);
   const gMessages = getGlobalMessages();
   console.log("current chat id", gMessages);
   if (sender === gMessages.chatId || receiver === gMessages.chatId) {
@@ -68,7 +70,7 @@ ws.on("message", (data) => {
         sender_id: sender,
         data: message,
         receiver_id: receiver,
-        timestamp: new Date().toISOString(),
+        timestamp,
       },
     ];
   }

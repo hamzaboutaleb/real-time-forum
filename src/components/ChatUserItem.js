@@ -20,7 +20,6 @@ export function ChatUserItem({ user, isOpen }) {
       </div>
       <div class="user-info">
         <span class="username">{user.username}</span>
-        <span class="last-message">Hey, how are you?</span>
       </div>
     </a>
   );
