@@ -12,4 +12,10 @@ export function setGlobalMessages(messages, chatId) {
     messages,
     chatId,
   };
+  console.log("gMessages", gMessages);
+}
+
+export function getGlobalMessages() {
+  console.log("get gMessages", gMessages);
+  return gMessages;
 }

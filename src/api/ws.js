@@ -1,5 +1,5 @@
 import { batch, untrack } from "../../core/signal.js";
-import { gMessages, typing, users } from "../state.js";
+import { getGlobalMessages, typing, users } from "../state.js";
 import { handleLogout } from "../utils/logout.js";
 import { WS, WS_EVENTS } from "../utils/ws.js";
 
@@ -59,14 +59,17 @@ ws.on("typing", (data) => {
 ws.on("message", (data) => {
   console.log("message", data);
   const { message, receiver, sender } = data;
-  if (sender === gMessages.chatId) {
+  const gMessages = getGlobalMessages();
+  console.log("current chat id", gMessages);
+  if (sender === gMessages.chatId || receiver === gMessages.chatId) {
     gMessages.messages.value = [
       ...gMessages.messages.value,
       {
         sender_id: sender,
         data: message,
         receiver_id: receiver,
-        timestamp: new Date().toISOString(),},
+        timestamp: new Date().toISOString(),
+      },
     ];
   }
 });

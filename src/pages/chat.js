@@ -15,8 +15,9 @@ export function ChatPage({ params }) {
   setGlobalMessages(messages, +params.id);
   let timeoutId = null;
   async function loadMessages() {
-    const data = (await fetchMessages(params.id)) || [];
+    let data = (await fetchMessages(params.id)) || [];
     console.log(data);
+    data = data.reverse();
     messages.value = data;
   }
 
@@ -26,20 +27,8 @@ export function ChatPage({ params }) {
     const data = message.value;
     message.value = "";
     ws.emit("message", { receiver: +params.id, message: data });
-    messages.value = [
-      ...messages.value,
-      {
-        sender_id: untrack(() => userId.value),
-        receiver_id: +params.id,
-        data: data,
-        timestamp: new Date().toISOString(),
-      },
-    ];
   }
 
-  function onUnmount() {
-    setGlobalMessages(null, null);
-  }
 
   loadMessages();
   function onInput(e) {
@@ -50,7 +39,7 @@ export function ChatPage({ params }) {
     ws.emit("typing", { receiver: +params.id });
   }
   return (
-    <div class="container" onUnmount={onUnmount}>
+    <div class="container">
       <div class="chat-window ">
         <div class="chat-header">
           <h2>hboutale</h2>
