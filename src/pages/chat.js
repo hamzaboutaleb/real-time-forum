@@ -20,19 +20,23 @@ export function ChatPage({ params }) {
   let messages = createSignal([]);
   let message = createSignal("");
   let lastMessageId = null;
-  let throttledLoadMessages = throttle(loadMessages, 4000);
+  let isDone = createSignal(false);
+  let throttledLoadMessages = throttle(loadMessages, 300);
 
   setGlobalMessages(messages, +params.id);
   let timeoutId = null;
   async function loadMessages(messageId) {
+    if (isDone.value) return;
     let data = (await fetchMessages(params.id, messageId)) || [];
     data = data.reverse();
-    console.log(data);
+    if (data.length === 0) {
+      isDone.value = true;
+      return;
+    }
     lastMessageId = data.at(0)?.msg_id;
     const oldTop = scrollEl.el.scrollHeight;
     if (!lastMessageId) return;
     const oldData = [...messages.value];
-    console.log("old data", oldData);
     messages.value = [];
     messages.value = [...data, ...oldData];
     console.log("messages", messages.value);
@@ -79,6 +83,23 @@ export function ChatPage({ params }) {
           </span>
         </div>
         <div class="chat-zone">
+          {() => {
+            if (isDone.value) {
+              return (
+                <div
+                  class="chat-done"
+                  onMount={(node) => {
+                    setTimeout(() => {
+                      node.remove();
+                    }, 1000);
+                  }}
+                >
+                  No more messages
+                </div>
+              );
+            }
+            return null;
+          }}
           <For
             each={messages}
             container={<div onMount={onMount} class="chat-body"></div>}
@@ -95,7 +116,7 @@ export function ChatPage({ params }) {
                     const typingSet = new Set(typing.value);
                     typingSet.delete(+params.id);
                     typing.value = typingSet;
-                  }, 1000000);
+                  }, 1000);
                   return <TypingIndicator />;
                 }
                 return null;
