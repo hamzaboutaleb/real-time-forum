@@ -5,8 +5,9 @@ export function initUsers(users, username) {
   users.forEach((user) => {
     if (user.username !== username) {
       usersList.push({
-        ...user,
+        last_message_time: new Date(0).toISOString(),
         online: false,
+        ...user,
       });
     }
   });
@@ -18,12 +19,12 @@ export function sortUsers(users) {
     if (a.last_message_time === b.last_message_time) {
       return a.username.localeCompare(b.username);
     }
+
     return new Date(b.last_message_time) - new Date(a.last_message_time);
   });
 }
 
 export function updateUserLastTimeMessage(usersId, newDate) {
-  console.log(usersId);
   const newData = users.value.map((user) => {
     if (usersId.includes(user.id)) {
       return {

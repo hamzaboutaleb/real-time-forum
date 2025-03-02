@@ -1,9 +1,9 @@
 export function throttle(func, delay) {
   let last;
-  return function () {
+  return function (...args) {
     const now = Date.now();
     if (!last || now - last >= delay) {
-      func();
+      func(...args);
       last = now;
     }
   };

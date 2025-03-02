@@ -6,16 +6,16 @@ export const users = createSignal([]);
 export const typing = createSignal(new Set());
 export const userId = createSignal(-1);
 export let gMessages = {};
+export const scrollEl = {};
 
 export function setGlobalMessages(messages, chatId) {
   gMessages = {
+    ...gMessages,
     messages,
     chatId,
   };
-  console.log("gMessages", gMessages);
 }
 
 export function getGlobalMessages() {
-  console.log("get gMessages", gMessages);
   return gMessages;
 }

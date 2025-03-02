@@ -1,7 +1,7 @@
 import { batch, untrack } from "../../core/signal.js";
-import { getGlobalMessages, typing, users } from "../state.js";
+import { getGlobalMessages, scrollEl, typing, users } from "../state.js";
 import { handleLogout } from "../utils/logout.js";
-import { updateUserLastTimeMessage } from "../utils/users.js";
+import { sortUsers, updateUserLastTimeMessage } from "../utils/users.js";
 import { WS, WS_EVENTS } from "../utils/ws.js";
 
 const WS_URL = "ws://localhost:8000/ws";
@@ -73,5 +73,21 @@ ws.on("message", (data) => {
         timestamp,
       },
     ];
+    if (scrollEl.el) {
+      scrollEl.el.scrollTo({ top: scrollEl.el.scrollHeight });
+    }
   }
+});
+
+ws.on("new_user", (data) => {
+  const newUser = {
+    ...data,
+    online: false,
+    last_message_time: new Date(0).toISOString(),
+  };
+
+  let usersList = [...users.value, newUser];
+  usersList = sortUsers(usersList);
+  console.log("new user", newUser);
+  users.value = usersList;
 });

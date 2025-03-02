@@ -18,7 +18,6 @@ import { wait } from "../utils/wait.js";
 // }
 
 function setLoginData(data) {
-  console.log("login data", data);
   localStorage.setItem("authToken", data.session_id);
   localStorage.setItem("username", data.username);
   localStorage.setItem("userId", data.user_id);
@@ -31,7 +30,6 @@ export function LoginPage() {
   const success = createSignal("");
   async function handleOnSubmit(e) {
     e.preventDefault();
-    console.log("login data");
     const formData = new FormData(e.target);
     try {
       error.value = "";

@@ -1,6 +1,6 @@
 import { h } from "../../core/view.js";
 import { Link, router } from "../app.js";
-import { users } from "../state.js";
+import { gMessages, users } from "../state.js";
 
 export function ChatUserItem({ user, isOpen }) {
   return (
@@ -8,14 +8,13 @@ export function ChatUserItem({ user, isOpen }) {
       onClick={(e) => {
         e.preventDefault();
         isOpen.value = false;
+        gMessages.username = user.username;
         router.navigate(`/chat/${user.id}`);
       }}
       class="user-chat"
     >
       <div class="avatar-status">
-        <div class="avatar avatar--large">
-          {user.username[0].toUpperCase()}
-        </div>
+        <div class="avatar avatar--large">{user.username[0].toUpperCase()}</div>
         <span class={user.online ? "status active" : "status"}></span>
       </div>
       <div class="user-info">
