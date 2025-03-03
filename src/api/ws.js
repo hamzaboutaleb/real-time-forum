@@ -1,4 +1,5 @@
 import { batch, untrack } from "../../core/signal.js";
+import { addNotification } from "../components/Notifcation.js";
 import { getGlobalMessages, scrollEl, typing, users } from "../state.js";
 import { handleLogout } from "../utils/logout.js";
 import { sortUsers, updateUserLastTimeMessage } from "../utils/users.js";
@@ -24,7 +25,6 @@ ws.on("online", (data, socket) => {
 });
 
 ws.on("offline", (data, socket) => {
-  console.log("offline", data);
   users.value = users.value.map((user) => {
     if (data.id === user.id) {
       return {
@@ -34,11 +34,9 @@ ws.on("offline", (data, socket) => {
     }
     return user;
   });
-  console.log(users.value);
 });
 
 ws.on("typing", (data) => {
-  console.log("typing", data);
   const typingSet = new Set(typing.value);
   typingSet.add(data.typerId);
   typing.value = typingSet;
@@ -62,7 +60,7 @@ ws.on("message", (data) => {
   const { message, receiver, sender, timestamp } = data;
   updateUserLastTimeMessage([sender, receiver], timestamp);
   const gMessages = getGlobalMessages();
-  console.log("current chat id", gMessages);
+  console.log("messages", gMessages);
   if (sender === gMessages.chatId || receiver === gMessages.chatId) {
     gMessages.messages.value = [
       ...gMessages.messages.value,
@@ -76,6 +74,11 @@ ws.on("message", (data) => {
     if (scrollEl.el) {
       scrollEl.el.scrollTo({ top: scrollEl.el.scrollHeight });
     }
+  } else {
+    addNotification(
+      "New message",
+      `You have a new message from ${gMessages.username}: ${message}`
+    );
   }
 });
 
@@ -88,6 +91,5 @@ ws.on("new_user", (data) => {
 
   let usersList = [...users.value, newUser];
   usersList = sortUsers(usersList);
-  console.log("new user", newUser);
   users.value = usersList;
 });

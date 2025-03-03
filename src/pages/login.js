@@ -46,7 +46,6 @@ export function LoginPage() {
       });
       router.navigate("/");
     } catch (err) {
-      console.log(err);
       error.value = err.data.message;
     }
   }

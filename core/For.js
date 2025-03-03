@@ -31,7 +31,7 @@ export function For({ each, component, container }) {
       }
     });
 
-    // 3. Add new items with fine-grained effects
+    // 3. Add new items
     newItems.forEach((newItem, index) => {
       const key = getKey(newItem, index);
       if (!itemMap.has(key)) {

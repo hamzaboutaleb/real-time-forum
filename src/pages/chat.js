@@ -33,13 +33,15 @@ export function ChatPage({ params }) {
       isDone.value = true;
       return;
     }
+    data = data.map((msg) => ({
+      ...msg,
+      id: msg.msg_id,
+    }));
     lastMessageId = data.at(0)?.msg_id;
     const oldTop = scrollEl.el.scrollHeight;
     if (!lastMessageId) return;
     const oldData = [...messages.value];
-    messages.value = [];
     messages.value = [...data, ...oldData];
-    console.log("messages", messages.value);
     if (!messageId) scrollEl.el.scrollTo({ top: scrollEl.el.scrollHeight });
     else scrollEl.el.scrollTo({ top: scrollEl.el.scrollHeight - oldTop });
   }
@@ -63,24 +65,25 @@ export function ChatPage({ params }) {
   }
 
   function onScroll(e) {
-    console.log(e.currentTarget.scrollTop);
     if (e.currentTarget.scrollTop == 0) {
       throttledLoadMessages(lastMessageId);
     }
   }
 
   function onMount(div) {
+    setGlobalMessages(messages, +params.id);
     scrollEl.el = div;
     div.addEventListener("scroll", onScroll);
   }
+
+  function onUnmount(div) {
+    setGlobalMessages(null, null);
+  }
   return (
     <div class="container">
-      <div class="chat-window ">
+      <div class="chat-window " onUnmount={onUnmount}>
         <div class="chat-header">
           <h2>{gMessages.username}</h2>
-          <span>
-            <i class="fa fa-times"></i>{" "}
-          </span>
         </div>
         <div class="chat-zone">
           {() => {

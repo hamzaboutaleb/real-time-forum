@@ -50,7 +50,6 @@ export function PostPage({ params }) {
       post.value = data.Post;
       comments.value = data.Comments || [];
     } catch (e) {
-      console.error(e);
     } finally {
       loading.value = false;
     }

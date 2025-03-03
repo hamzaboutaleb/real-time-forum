@@ -10,6 +10,7 @@ import { getPostById } from "./api/post.js";
 import { ChatList } from "./components/chatList.js";
 import { Footer } from "./components/footer.js";
 import { Header } from "./components/header.js";
+import { Toast } from "./components/Notifcation.js";
 import { ChatPage } from "./pages/chat.js";
 import { CreatePostPage } from "./pages/createPost.js";
 import { IndexPage } from "./pages/index.js";
@@ -61,6 +62,7 @@ function App() {
   router.navigate("/");
   return (
     <div>
+      <Toast />
       <Header />
       <RouterView router={router} />
       {() => {
